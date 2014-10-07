@@ -2,6 +2,7 @@ from PyQt4.uic import loadUi
 from PyQt4.QtGui import QWidget, QFileDialog
 from PyQt4.QtCore import pyqtSlot
 from sys import exit
+from shutil import copy
 
 class SyncSongWidget(QWidget):
     
@@ -33,6 +34,20 @@ class SyncSongWidget(QWidget):
     @pyqtSlot()
     def Accepted(self):
         print "Accepted"
+        self.Ui.ButtonBox.setDisabled(True)
+        from xml.dom.minidom import parse
+        dom1 = parse(str(self.Ui.SourceFileLineEdit.text()))
+        ChildList = dom1.childNodes[0].childNodes[0].childNodes
+
+        copyCount = 0
+        for node in ChildList:
+            filename = node.childNodes[0].childNodes[0].toxml()
+            filename = filename.replace("&amp;", "&")
+            print "Copying: " + filename[7:]
+            copy(filename[7:], str(self.Ui.DestinationDirectoryLineEdit.text()))
+            copyCount = copyCount + 1
+        print "Copying Complete!"
+        self.Ui.ButtonBox.setEnabled(True)
 
     @pyqtSlot()
     def Rejected(self):
